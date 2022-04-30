@@ -1,6 +1,7 @@
 let myLeads = []
 const inputEl = document.getElementById("input-el")
 const inputBtn = document.getElementById("input-btn")
+const tabBtn = document.getElementById("tab-btn")
 const deleteBtn = document.getElementById("delete-btn")
 const ulEl = document.getElementById("ul-el")
 
@@ -8,7 +9,7 @@ const leadsFromLocalStorage = JSON.parse(localStorage.getItem("myLeads"))
 
 if (Boolean(leadsFromLocalStorage)) {
     myLeads = leadsFromLocalStorage
-    renderLeads()
+    render(myLeads)
 }
 
 inputBtn.addEventListener("click", function() {
@@ -17,21 +18,27 @@ inputBtn.addEventListener("click", function() {
 
     localStorage.setItem("myLeads", JSON.stringify(myLeads))
 
-    renderLeads()
+    render(myLeads)
+})
 
-    console.log(JSON.parse(localStorage.getItem("myLeads")))
+tabBtn.addEventListener("click", function() {
+    chrome.tabs.query({active:true, currentWindow: true}, function(tabs) {
+        myLeads.push(tabs[0].url)
+        localStorage.setItem("myLeads", JSON.stringify(myLeads))
+        render(myLeads)
+    })
 })
 
 deleteBtn.addEventListener("dblclick", function() {
     localStorage.clear()
     myLeads.length = 0
-    renderLeads()
+    render(myLeads)
 })
 
-function renderLeads() {
+function render(leads) {
     let listItems = ""
 
-    for (let item of myLeads) {
+    for (let item of leads) {
         listItems += `
             <li>
                 <a target='_blank' href='${item}'>
